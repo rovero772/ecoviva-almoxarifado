@@ -1,40 +1,13 @@
-# Deploy para produção
+# Deploy no Render
 
-## Frontend (Vercel)
+O arquivo `render.yaml` configura a aplicação como um único serviço: o Render compila o frontend, o servidor Express entrega os arquivos da pasta `dist` e o SQLite fica em um disco persistente.
 
-1. Conecte este repositório ao Vercel.
-2. Defina a pasta de build como: `dist`
-3. Configure a variável de ambiente:
-   - `VITE_API_URL=https://SEU_BACKEND_URL/api`
-4. O comando de build já está configurado em `package.json`.
+1. Entre no [Render](https://render.com/) e escolha **New > Blueprint**.
+2. Conecte o repositório `rovero772/ecoviva-almoxarifado`.
+3. Antes de criar o serviço, informe `ADMIN_EMAIL` e `ADMIN_PASSWORD` como variáveis secretas. Use uma senha forte e exclusiva.
+4. Confirme a criação. O Render fará o build e publicará o endereço HTTPS do serviço.
+5. Acesse `https://SEU-SERVICO.onrender.com` e entre com o e-mail e senha definidos no passo 3.
 
-## Backend (Render / Railway)
+O Blueprint gera `JWT_SECRET` e monta o disco persistente em `/var/data`, onde fica o banco. O serviço e o disco podem ter cobrança no Render; confira o valor exibido antes de confirmar.
 
-1. Conecte o repositório ao Render.
-2. Configure o comando de start:
-   - `npm start`
-3. Defina as variáveis de ambiente:
-   - `PORT=3001`
-   - `JWT_SECRET=sua_chave_muito_segura`
-4. Exponha a API em HTTPS.
-
-## Banco em produção
-
-Para acesso público, prefira PostgreSQL em vez de SQLite.
-
-### Dados locais demo
-- Usuário demo:
-  - Email: `admin@ecoviva.com`
-  - Senha: `admin123`
-
-## Exemplo de URL final
-
-- Frontend: `https://ecoviva-app.vercel.app`
-- Backend: `https://ecoviva-api.onrender.com`
-- API final: `https://ecoviva-api.onrender.com/api`
-
-## Observações
-
-- Para uso real, o backend deve estar com HTTPS e banco externo.
-- O frontend pode continuar usando rota relativa localmente (`/api`).
-- Em produção, use `VITE_API_URL` para apontar para a API pública.
+Em produção, o usuário demo `admin@ecoviva.com` / `admin123` não é criado. O administrador inicial usa as credenciais secretas configuradas no Render. Não publique essas credenciais no GitHub.

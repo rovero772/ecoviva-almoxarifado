@@ -44,10 +44,19 @@ export function seedDemoData() {
     INSERT OR IGNORE INTO users (name, email, password, role, phone, active)
     VALUES (?, ?, ?, ?, ?, 1)
   `);
-  userInsert.run('Administrador', 'admin@ecoviva.com', bcrypt.hashSync('admin123', 10), 'Administrador', '(11) 90000-0000');
-  userInsert.run('Almoxarife', 'almoxarife@ecoviva.com', bcrypt.hashSync('almox123', 10), 'Almoxarife', '(11) 90000-0001');
-  userInsert.run('Engenharia', 'engenharia@ecoviva.com', bcrypt.hashSync('eng123', 10), 'Engenharia', '(11) 90000-0002');
-  userInsert.run('Consulta', 'consulta@ecoviva.com', bcrypt.hashSync('cons123', 10), 'Consulta', '(11) 90000-0003');
+  if (process.env.NODE_ENV === 'production') {
+    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) {
+      throw new Error('Configure ADMIN_EMAIL e ADMIN_PASSWORD para criar o administrador inicial.');
+    }
+    userInsert.run('Administrador', adminEmail, bcrypt.hashSync(adminPassword, 10), 'Administrador', '');
+  } else {
+    userInsert.run('Administrador', 'admin@ecoviva.com', bcrypt.hashSync('admin123', 10), 'Administrador', '(11) 90000-0000');
+    userInsert.run('Almoxarife', 'almoxarife@ecoviva.com', bcrypt.hashSync('almox123', 10), 'Almoxarife', '(11) 90000-0001');
+    userInsert.run('Engenharia', 'engenharia@ecoviva.com', bcrypt.hashSync('eng123', 10), 'Engenharia', '(11) 90000-0002');
+    userInsert.run('Consulta', 'consulta@ecoviva.com', bcrypt.hashSync('cons123', 10), 'Consulta', '(11) 90000-0003');
+  }
 
   const categoryMap = Object.fromEntries(db.prepare('SELECT id, name FROM categories').all().map((c) => [c.name, c.id]));
   const supplierMap = Object.fromEntries(db.prepare('SELECT id, corporate_name FROM suppliers').all().map((s) => [s.corporate_name, s.id]));

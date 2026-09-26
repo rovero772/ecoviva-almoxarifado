@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import path from 'node:path';
 import db from './db.js';
 import { formatCurrency, formatDateBR, getStockStatus, nowIso } from './utils.js';
 import { ensureSchema } from './schema.js';
@@ -532,6 +533,13 @@ app.get('/api/bootstrap', requireAuth, (req, res) => {
   const locations = db.prepare('SELECT id, name FROM locations ORDER BY name ASC').all();
 
   res.json({ users, materials, categories, works, suppliers, locations });
+});
+
+const distPath = path.resolve('dist');
+app.use(express.static(distPath));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(port, () => {
